@@ -1,0 +1,71 @@
+{
+  "skill_name": "vasp-kit",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我在 opt 文件夹下，里面有 POSCAR 文件。帮我生成 VASP 的四个输入文件（INCAR, KPOINTS, POTCAR），SCF 计算用的，K 点间距用 0.03。生成 INCAR 的时候选择自洽计算模式。",
+      "expected_output": "在 opt 目录下依次执行 vaspkit -task 101（INCAR）, vaspkit -task 102 -kpr 0.03（KPOINTS）, vaspkit -task 103（POTCAR），告知用户生成的文件列表。",
+      "assertions": [
+        "Identifies vaspkit -task 101 for INCAR generation with self-consistent (自洽) mode",
+        "Identifies vaspkit -task 102 -kpr 0.03 for KPOINTS generation with correct K-spacing",
+        "Identifies vaspkit -task 103 for POTCAR generation",
+        "Checks or mentions checking that POSCAR exists in opt/ directory before proceeding",
+        "Shows the complete commands to the user before proposing execution",
+        "Mentions the output files that will be generated (INCAR, KPOINTS, POTCAR)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "我在 band 目录下，已经跑完了能带计算。帮我画一下能带图，要按元素投影的那种。",
+      "expected_output": "检测到 EIGENVAL 和 DOSCAR 文件，执行 vaspkit -task 213（按元素投影能带），生成 BAND.dat, PBAND_*.dat 和 BAND.png。",
+      "assertions": [
+        "Identifies vaspkit -task 213 for projected band structure by element",
+        "Checks or mentions that EIGENVAL and DOSCAR (and ideally PROCAR) are needed in band/ directory",
+        "User explicitly requested element projection — should NOT ask again whether to project or by what method",
+        "Mentions expected output files: BAND.dat, PBAND_*.dat, BAND.png or similar",
+        "Shows the vaspkit command clearly to the user"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "帮我在 scf 目录下提交这个自洽计算到集群上去。体系有 48 个原子，正常跑就行。我们集群的分区是 gpu-a100，先给我看看作业脚本。",
+      "expected_output": "生成定制化的 SLURM 作业脚本（含 #SBATCH 参数、module 环境初始化、mpirun+hostfile 或 srun 执行），展示给用户审阅，并请求确认后再提交。不直接执行 sbatch。",
+      "assertions": [
+        "Generates a complete SLURM job script with #SBATCH directives",
+        "Uses correct partition: gpu-a100",
+        "Uses appropriate resource parameters for 48 atoms (medium system: 1 node, ~32 cores, or similar reasonable choice)",
+        "Sets a reasonable time limit (e.g., 12:00:00 for normal calculation)",
+        "Does NOT execute sbatch or submit the job — only shows script and waits for user confirmation",
+        "Checks or mentions checking that VASP input files (INCAR, POSCAR, KPOINTS, POTCAR) exist in scf/ directory",
+        "Shows the complete job script content to the user for review",
+        "Includes cluster-standard environment setup: source module.sh and module load mpi/oneAPI",
+        "Includes VASP binary path and uses mpirun (with hostfile) or srun for execution"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "我在 dos 目录下，刚跑完 DOS 计算。帮我提取总 DOS 和按元素投影的 DOS，同事想看 O 的 p 轨道贡献。",
+      "expected_output": "先执行 vaspkit -task 111（总 DOS），再执行 vaspkit -task 113（按元素投影 DOS），产出 TDOS.dat 和 PDOS_*.dat。",
+      "assertions": [
+        "Identifies vaspkit -task 111 for total DOS extraction",
+        "Identifies vaspkit -task 113 or 115 for projected DOS (by element or by atom+orbital)",
+        "Acknowledges the user's request for O p-orbital contribution — mentions task 115 or otherwise addresses orbital projection",
+        "Checks or mentions that DOSCAR and EIGENVAL exist in dos/ directory",
+        "Mentions expected output files: TDOS.dat, PDOS_*.dat, and/or TDOS.png",
+        "Shows the vaspkit commands clearly to the user"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "帮我生成 KPOINTS 文件。",
+      "expected_output": "询问用户缺失的关键参数：当前目录在哪？是 SCF 用还是能带用的 KPOINTS？K 点间距多少？什么材料维度（2D/3D/1D）？在获得足够信息后再生成命令。",
+      "assertions": [
+        "Does NOT immediately execute or propose a specific vaspkit command without clarification",
+        "Asks the user at least 2 clarifying questions (e.g., which directory, SCF or band, K-spacing, 2D/3D/1D)",
+        "Explains the different KPOINTS generation tasks available (task 102 for SCF MP grid vs task 301/302/303 for band path)",
+        "Mentions that POSCAR is needed for K-path generation (band) and optionally for SCF KPOINTS",
+        "Provides recommended defaults (e.g., K-spacing 0.03 for accurate, 0.04-0.05 for quick) to guide the user"
+      ]
+    }
+  ]
+}
