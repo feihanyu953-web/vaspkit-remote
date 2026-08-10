@@ -21,12 +21,12 @@ description: 通过 cluster-connect 远程驱动集群上的 VASPKIT 执行 VASP
 python <cc-dir>/scripts/cluster.py exec "which vaspkit; vaspkit --version 2>&1 | head -3"
 ```
 
-| 版本 | 输出特征 | 调用模式 |
-|---|---|---|
-| **1.5.x** | 显示 "Running VASPKIT Under Command-Line Mode" | **flag 模式**：`vaspkit -task XXX` |
-| **1.3.x** | 直接进入交互菜单 | **printf 管道**：`printf '...' \| vaspkit` |
+| 版本 | 调用模式 |
+|---|---|
+| **1.5.x** | **flag 模式**：`vaspkit -task XXX`（首选） |
+| **1.3.x** | **flag 模式同样可用**（实测 1.3.3/1.3.5 的 `-task 601` 正常读取 POSCAR 并生成 SYMMETRY）；交互式任务（需回答参数）用 printf 管道 |
 
-> ⚠️ 1.3.x 的 `-task XXX -xxx` 命令行 flag 会**静默失败**（退出码 0 但不读取 POSCAR、不生成任何文件），必须用管道模式。
+> 区分版本看 banner 里的版本字符串（`1.3.5 (03 Jul. 2022)` vs `1.5.1 (27 Jan. 2024)`），**不要**用 "Running VASPKIT Under Command-Line Mode" 判断——该行 1.3.x 与 1.5.x 在 flag 模式下都会打印。1.5.1 的 `--version` 结尾会多一行 "Unsupported Parameter!" 报错，属正常噪音，banner 内的版本号不受影响。同一台机器可能装多个版本（如 169 有 1.3.3/1.3.5/1.5.1 三套），以 `which vaspkit` 的 PATH 结果为准。
 
 ## 调用模板
 
@@ -36,7 +36,7 @@ python <cc-dir>/scripts/cluster.py exec "which vaspkit; vaspkit --version 2>&1 |
 python <cc-dir>/scripts/cluster.py exec "cd <calc-dir> && vaspkit -task 601"
 ```
 
-### 1.3.x 节点 — printf 管道
+### 交互式任务（需回答参数，所有版本通用）— printf 管道
 
 ```powershell
 python <cc-dir>/scripts/cluster.py exec "cd <calc-dir> && printf '6\n601\n0\n0\n' | vaspkit"
@@ -68,7 +68,7 @@ python <cc-dir>/scripts/cluster.py --profile <name> exec "cd <calc-dir> && vaspk
 | 吸附质 / 气体热修正 | 501 / 502 | OUTCAR |
 | d 带中心 | 503 | — |
 
-## printf 管道序列规范（1.3.x）
+## printf 管道序列规范
 
 1. 序列 = 主菜单数字 + task 编号 + 参数回答 + 退出选择，每项用 `\n` 分隔
 2. 已实测示例：`printf '6\n601\n0\n0\n' | vaspkit`（对称性分析，主菜单 6 → task 601 → 确认 → 退出）
@@ -100,7 +100,8 @@ Windows 无 rsync 时 cluster-connect 自动降级 scp，无需额外操作。
 
 | 坑 | 现象 | 对策 |
 |---|---|---|
-| 1.3.x 命令行 flag 静默失败 | 退出码 0、无文件生成 | 一律 printf 管道 |
+| 1.5.1 菜单 84 (ABACUS Interface) 不可用 | 进入报 "(*_*) Unsupported Parameter! Try Again..."，无任务可选 | 规避该菜单（1.5.1 此功能未启用） |
+| printf 管道输入序列不足 | vaspkit 非交互读 stdin 遇 EOF，forrtl severe (24) 崩溃退出 | 序列必须完整（主菜单+task+参数+退出）；执行后以产物文件为准，崩溃不影响已生成的文件 |
 | vaspkit 1.5.1 的 MSD task（721/722）对 VASP 6 写的 XDATCAR 全 NaN | MSD.dat 全 NaN 且不报错 | 用本地 Python PBC-unwrap 替代（README 附示例） |
 | task 111 缺 PROCAR 报错退出 | 总 DOS 理论上不需要 PROCAR 仍报错 | 改用 task 211 间接获取费米能级 |
 | 全原子 RDF 峰归属模糊 | 0.94 Å（O-H）、2.69 Å（氢键/K-O 混合） | 元素分辨 RDF（726 或自算） |

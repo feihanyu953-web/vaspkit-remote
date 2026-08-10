@@ -4,10 +4,10 @@
 
 ## 特性
 
-- **200+ VASPKIT task 完整映射**（`references/vaspkit_tasks.md`，含前提文件标注）
-- **双模式适配**：vaspkit 1.5.x 用命令行 flag 模式；1.3.x 自动用 printf 管道驱动交互菜单（规避 1.3.x 的静默失败 bug）
+- **200+ VASPKIT task 完整映射**（`references/vaspkit_tasks.md`，含前提文件标注与 1.3.x/1.5.x 版本差异）
+- **双模式适配**：1.3.x 与 1.5.x 均支持命令行 flag 模式（`vaspkit -task XXX`）；交互式任务（需回答参数）用 printf 管道
 - **前置检查清单**：缺 PROCAR / CHGCAR / LOCPOT 时提前告知，避免白跑
-- **已知坑固化**：1.3.x 静默失败、1.5.1 MSD 全 NaN、AUTO_PLOT 不出图、task 102 覆盖 INCAR 等，均已写明对策
+- **已知坑固化**：1.5.1 MSD 全 NaN、1.5.1 菜单 84 不可用、AUTO_PLOT 不出图、task 102 覆盖 INCAR 等，均已写明对策
 - **零新增代码**：执行层、沙箱、确认机制全部复用 cluster-connect
 
 ## 前置依赖
@@ -37,8 +37,8 @@ Copy-Item -Recurse vaspkit-remote <your-project>/.claude/skills/
 python <cc-dir>/scripts/cluster.py exec "which vaspkit; vaspkit --version 2>&1 | head -3"
 ```
 
-- 输出 "Running VASPKIT Under Command-Line Mode" → 1.5.x，用 flag 模式
-- 直接进交互菜单 → 1.3.x，用 printf 管道
+- 读 banner 中的版本字符串判断版本（`1.3.5 (03 Jul. 2022)` vs `1.5.1 (27 Jan. 2024)`）——"Running VASPKIT Under Command-Line Mode" 在 1.3.x/1.5.x 的 flag 模式下都会打印，不能用作版本判据
+- 1.3.x 与 1.5.x 都支持 flag 模式（`vaspkit -task XXX`）
 
 **2. 画总能带（示例，flag 模式）**：
 
@@ -75,7 +75,7 @@ python <cc-dir>/scripts/cluster.py exec "cd <calc-dir> && printf '6\n601\n0\n0\n
 
 - 依赖 cluster-connect 的 `root_dir` 沙箱：计算目录必须在沙箱内才能 pull 结果
 - vaspkit 1.5.1 的 MSD task 对 VASP 6 的 XDATCAR 输出全 NaN（vaspkit bug，非本 skill 问题）——建议本地 Python 计算（示例见下）
-- 1.3.x 的管道序列因 task 而异，不确定时先无管道跑一次看提示
+- printf 管道序列因 task 而异，不确定时先无管道跑一次看提示
 - 绘图依赖集群 `~/.vaspkit` 的 AUTO_PLOT / PYTHON_BIN / 字体配置；未配置时只出数据文件
 
 ### MSD 替代方案（vaspkit 1.5.1 全 NaN 时）

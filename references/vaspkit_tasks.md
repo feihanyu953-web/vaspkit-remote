@@ -16,6 +16,22 @@ vaspkit -task <task-id> [options]
 
 ---
 
+## 版本差异速览（1.3.x vs 1.5.x）
+
+本 task 表按 **VASPKIT 1.5.x** 编号编写（169 集群）。**167 集群跑 1.3.5**，以下 task 在 1.3.x 上**不存在**（执行会报错/无此菜单项）：
+
+- 菜单 06：604
+- 菜单 07：整组（702/705）；菜单 44/84/95：整个菜单无
+- 菜单 08：800 / 821 / 822 / 825 / 826 / 827
+- 菜单 11：110 / 123 / 124 / 125 / 126
+- 菜单 31：310 / 328 / 329（1.3.x 的 318=xsf 导出、319=cube 导出）
+- 菜单 42：420 / 422（1.3.x 的 425=2D 线性平均势）
+- 菜单 62：629；菜单 65：653；菜单 72：730 / 731；菜单 92：926
+
+1.3.x 与 1.5.x 在菜单 01/02/03/05/06(601-603,608,609)/21/23/25/26/28/51/65(651,652)/68/71/72(721-728)/78/91 上的 task 编号一致。
+
+---
+
 ## 01 — VASP 输入文件生成器
 
 | 任务 | 功能 | 前提文件 |
@@ -59,7 +75,9 @@ vaspkit -task <task-id> [options]
 
 ---
 
-## 04 — 结构编辑器
+## 04 — 结构编辑器（编号随版本不同，注意区分）
+
+**1.5.x 编号（实测 1.5.1）：**
 
 | 任务 | 功能 | 前提文件 |
 |:-----|:-----|:---------|
@@ -69,17 +87,19 @@ vaspkit -task <task-id> [options]
 | 403 | 移动选定原子 | POSCAR |
 | 404 | 删除选定原子 | POSCAR |
 | 405 | 交换晶格矢量轴 | POSCAR |
-| 406 | 沿指定方向排序原子坐标 | POSCAR |
-| 407 | 对选定原子施加随机位移 | POSCAR |
+| 406 | 按指定方向排序原子坐标 | POSCAR |
+| 407 | 旋转晶格矢量 | POSCAR |
 | 408 | 绕指定轴旋转选定原子 | POSCAR |
 | 409 | 在指定位置添加原子 | POSCAR |
 | 410 | 替换选定原子 | POSCAR |
 | 411 | 从另一结构文件复制选定原子 | POSCAR + 源文件 |
-| 412 | 分数坐标与笛卡尔坐标转换 | POSCAR |
-| 416 | 导出 CIF 格式 | POSCAR |
-| 417 | 导出 PDB 格式 | POSCAR |
-| 418 | 导出 XCrySDen 格式 (.xsf) | POSCAR |
-| 419 | 导出 XYZ 格式 | POSCAR |
+| 412 | 对选定原子施加随机位移 | POSCAR |
+| 413 | 分数坐标与笛卡尔坐标转换 | POSCAR |
+| 414 | 消除优化后的虚假晶格畸变 | POSCAR |
+| 415 | 指定平面镜像变换 | POSCAR |
+| 419 | 导出其他结构格式 | POSCAR |
+
+**1.3.x 编号不同（实测 1.3.5，注意错位）：** 407=随机位移、408=旋转晶格矢量、409=消除畸变、410=导出 CP2K（排在最末）、411=笛卡尔坐标、412=分数坐标、413=CIF、414=ATAT、415=XCrySDen (.xsf)、416=Quantum-Espresso、417=Elk、418=Siesta、419=PDB；**无独立的 XYZ 导出**。
 
 ---
 
@@ -105,13 +125,13 @@ vaspkit -task <task-id> [options]
 | 601 | 寻找晶体对称性（空间群） | POSCAR |
 | 602 | 寻找原胞 | POSCAR |
 | 603 | 寻找标准惯用胞 | POSCAR |
-| 604 | 寻找对称等价原子 | POSCAR |
+| 604 | 寻找对称等价原子（**仅 1.5.x**，1.3.x 无此任务） | POSCAR |
 | 608 | 寻找弛豫后结构对称性 | CONTCAR |
 | 609 | 寻找分子或团簇对称性 | POSCAR |
 
 ---
 
-## 07 — 材料数据库
+## 07 — 材料数据库（仅 1.5.x，1.3.x 无此菜单）
 
 | 任务 | 功能 |
 |:-----|:-----|
@@ -129,6 +149,8 @@ vaspkit -task <task-id> [options]
 | 802 | 构建随机替代合金 | POSCAR |
 | 803 | 按 Miller 指数构建表面 | POSCAR |
 | 804 | 从两个 Slab 构建异质结 | 两个 POSCAR |
+| 806 | 按指定半径构建量子点 | POSCAR |
+| 807 | 按指定半径构建纳米线/2D 量子点 | POSCAR |
 | 808 | 从正交 Slab 构建纳米管 | POSCAR |
 | 821 | 构建超胞中非等效空位缺陷 | POSCAR |
 | 822 | 构建超胞中非等效替代缺陷 | POSCAR |
@@ -136,12 +158,15 @@ vaspkit -task <task-id> [options]
 | 826 | 按手性矢量构建纳米带 | POSCAR |
 | 827 | 按手性矢量构建纳米管 | POSCAR |
 
+> 1.3.x 编号不同：无 800/806/807/821/822/825/826/827；1.3.x 的 805/806/807 是 Pro-Only 的 Moiré 超晶格/纳米带/纳米管（对应 1.5.x 的 825/826/827）。
+
 ---
 
 ## 11 — 态密度 (DOS)
 
 | 任务 | 功能 | 前提文件 |
 |:-----|:-----|:---------|
+| 110 | 逆参与比 Inverse Participation Ratio（**仅 1.5.x**） | DOSCAR |
 | 111 | 总 DOS | DOSCAR, EIGENVAL |
 | 112 | 单个选定原子的投影 DOS | DOSCAR, EIGENVAL, PROCAR |
 | 113 | 各元素投影 DOS | DOSCAR, EIGENVAL, PROCAR |
@@ -152,10 +177,10 @@ vaspkit -task <task-id> [options]
 | 118 | 从 EIGENVAL + PROCAR 计算投影 DOS | EIGENVAL, PROCAR |
 | 119 | 指定 K 指数投影 DOS | DOSCAR, EIGENVAL |
 | 120 | 指定能带指数投影 DOS | DOSCAR, EIGENVAL |
-| 123 | 3D 空间分辨 DOS（能量范围） | - |
-| 124 | 3D 空间分辨磁 DOS | - |
-| 125 | 2D 平面平均空间分辨 DOS | - |
-| 126 | 2D 平面平均空间分辨磁 DOS | - |
+| 123 | 3D 空间分辨 DOS（能量范围，**仅 1.5.x**） | - |
+| 124 | 3D 空间分辨磁 DOS（**仅 1.5.x**） | - |
+| 125 | 2D 平面平均空间分辨 DOS（**仅 1.5.x**） | - |
+| 126 | 2D 平面平均空间分辨磁 DOS（**仅 1.5.x**） | - |
 
 ---
 
@@ -238,8 +263,10 @@ vaspkit -task <task-id> [options]
 | 318 | 沿指定路径 1D 电荷密度 | CHGCAR |
 | 320 | 通过变换矩阵构建电荷密度超胞 | CHGCAR |
 | 325 | STM 模拟 | CHGCAR |
-| 328 | CHGCAR/PARCHG → XCrySDen .xsf | CHGCAR |
-| 329 | CHGCAR/PARCHG → Gaussian .cube | CHGCAR |
+| 328 | CHGCAR/PARCHG → XCrySDen .xsf（**仅 1.5.x**） | CHGCAR |
+| 329 | CHGCAR/PARCHG → Gaussian .cube（**仅 1.5.x**） | CHGCAR |
+
+> 1.3.x 菜单 31 无 310/328/329；且编号错位：1.3.x 的 318=导出 XCrySDen (.xsf)、319=导出 Gaussian (.cube)。
 
 ---
 
@@ -247,14 +274,23 @@ vaspkit -task <task-id> [options]
 
 | 任务 | 功能 | 前提文件 |
 |:-----|:-----|:---------|
-| 420 | 2D 势切片 | LOCPOT |
-| 422 | 2D 线性平均势 | LOCPOT |
+| 420 | 2D 势切片（**仅 1.5.x**） | LOCPOT |
+| 422 | 2D 线性平均势（**仅 1.5.x**；1.3.x 对应任务在 425） | LOCPOT |
 | 425 | 沿指定路径 1D 势 | LOCPOT |
 | 426 | 1D 平面平均势（功函数） | LOCPOT |
 | 427 | 1D 宏观平均势 | LOCPOT |
 | 428 | LOCPOT/ELFCAR → XCrySDen .xsf | LOCPOT |
 | 429 | LOCPOT/ELFCAR → Gaussian .cube | LOCPOT |
 | 430 | 通过变换矩阵构建势超胞 | LOCPOT |
+
+---
+
+## 44 — 压电性质（仅 1.5.x）
+
+| 任务 | 功能 | 前提文件 |
+|:-----|:-----|:---------|
+| 442 | 压电与介电常数（从 OUTCAR） | OUTCAR |
+| 443 | 压电性质 | - |
 
 ---
 
@@ -275,6 +311,7 @@ vaspkit -task <task-id> [options]
 | 任务 | 功能 | 前提文件 |
 |:-----|:-----|:---------|
 | 621 | 磁各向异性能 (MAE) | OUTCAR |
+| 629 | 可视化磁矩矢量（**仅 1.5.x**） | OUTCAR |
 
 ---
 
@@ -284,7 +321,7 @@ vaspkit -task <task-id> [options]
 |:-----|:-----|:---------|
 | 651 | 生成自旋纹理 KPOINTS | POSCAR |
 | 652 | 2D 材料能带自旋纹理（仅 SOC） | EIGENVAL, DOSCAR |
-| 653 | 块体材料能带自旋纹理（仅 SOC） | EIGENVAL, DOSCAR |
+| 653 | 块体材料能带自旋纹理（仅 SOC，**仅 1.5.x**；1.3.x 无此任务） | EIGENVAL, DOSCAR |
 
 ---
 
@@ -322,8 +359,8 @@ vaspkit -task <task-id> [options]
 | 726 | 选定元素径向分布函数 | PCDAT |
 | 727 | 速度自关联函数 | XDATCAR |
 | 728 | 振动 DOS（从速度自关联） | XDATCAR |
-| 730 | 选定元素键长分布 | XDATCAR |
-| 731 | 选定元素键角分布 | XDATCAR |
+| 730 | 选定元素键长分布（**仅 1.5.x**） | XDATCAR |
+| 731 | 选定元素键角分布（**仅 1.5.x**） | XDATCAR |
 | 736 | 选定原子 MD 轨迹（POSCAR 格式） | XDATCAR |
 | 737 | 选定原子 MD 轨迹（PDB 格式） | XDATCAR |
 
@@ -336,6 +373,12 @@ vaspkit -task <task-id> [options]
 | 781 | VASP → BoltzTraP 接口 | EIGENVAL, DOSCAR |
 | 788 | 原子间力常数张量归一化迹 | - |
 | 789 | 为 Phonopy 排序声子能带 | - |
+
+---
+
+## 84 — ABACUS 接口（仅 1.5.x；⚠️ 1.5.1 上不可用）
+
+主菜单有 84) ABACUS Interface 一项，但 **1.5.1 实际进入报 "Unsupported Parameter! Try Again"，无任务可用**（实测）。若需 ABACUS 互转，检查更新版本 VASPKIT。
 
 ---
 
@@ -359,9 +402,20 @@ vaspkit -task <task-id> [options]
 | 921 | 将原子层沿 z 方向居中 | POSCAR |
 | 922 | 调整真空层厚度 | POSCAR |
 | 923 | 标准化 2D 晶体胞 | POSCAR |
-| 926 | 堆叠依赖势能面 | POSCAR |
+| 926 | 堆叠依赖势能面（**仅 1.5.x**） | POSCAR |
 | 927 | 参考真空能级的能带边（2D） | EIGENVAL, LOCPOT |
 | 929 | 弛豫 2D 结构汇总 | OUTCAR |
+
+---
+
+## 95 — 声子分析（仅 1.5.x）
+
+| 任务 | 功能 | 前提文件 |
+|:-----|:-----|:---------|
+| 952 | 声子色散（从 OUTCAR） | OUTCAR |
+| 953 | 各元素投影声子色散 | OUTCAR |
+| 954 | 选定原子投影声子色散 | OUTCAR |
+| 955 | 按元素权重投影声子色散 | OUTCAR |
 
 ---
 
@@ -398,5 +452,5 @@ vaspkit -task 803              # 构建表面（Miller 指数）
 vaspkit -task 911              # 带隙分析（VBM/CBM）
 vaspkit -task 426              # 功函数/平面平均势
 vaspkit -task 203              # 弹性常数（从 OUTCAR）
-vaspkit -task 310              # 2D 电荷密度切片
+vaspkit -task 310              # 2D 电荷密度切片（仅 1.5.x，1.3.x 无此任务）
 ```
